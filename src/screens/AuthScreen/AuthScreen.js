@@ -16,8 +16,50 @@ import {
   Text,
 } from 'native-base';
 import { FIREBASE_AUTH } from '../../services/FirebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-const SignUp = () => (
+
+import { signInWithEmailAndPassword ,createUserWithEmailAndPassword } from 'firebase/auth';
+const SignUp = ({navigation}) => {
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const auth = FIREBASE_AUTH;
+
+  const handleSignUp = async () => {
+    if (newPassword !== confirmPassword) {
+      
+      setErrorMessage('Passwords do not match');
+      
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        newEmail,
+        newPassword
+      );
+      // Successfully signed up
+      console.log('User signed up:', userCredential.user);
+      setShowAlert(true);
+      setTimeout(() => {
+        // Navigate to the home screen or any other screen
+        navigation.navigate('HomeScreen');
+        setShowAlert(false);
+      }, 2000);
+      setErrorMessage('');
+      setNewEmail('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      // Handle sign-up errors
+      console.error('Error signing up:', error.message);
+      setErrorMessage(error.message);
+    }
+  };
+  return(
   <Center w="100%">
     <Box safeArea p="2" w="90%" maxW="290" py="8">
       <Heading
@@ -37,26 +79,60 @@ const SignUp = () => (
       >
         Sign up to continue!
       </Heading>
+      {showAlert && (
+        <Alert
+          mt="14"
+          w="100%"
+          variant="outline"
+          colorScheme="success"
+          status="success"
+        >
+          <VStack space={2} flexShrink={1} w="100%">
+            <HStack
+              flexShrink={1}
+              space={2}
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack space={2} flexShrink={1} alignItems="center">
+                <Alert.Icon />
+                <Text>Successfully logged in</Text>
+              </HStack>
+            </HStack>
+          </VStack>
+        </Alert>
+      )}
       <VStack space={3} mt="5">
-        <FormControl>
+      <FormControl>
           <FormControl.Label>Email</FormControl.Label>
-          <Input />
+          <Input value={newEmail} onChangeText={(text) => setNewEmail(text)} />
         </FormControl>
         <FormControl>
           <FormControl.Label>Password</FormControl.Label>
-          <Input type="password" />
+          <Input
+            type="password"
+            value={newPassword}
+            onChangeText={(text) => setNewPassword(text)}
+          />
         </FormControl>
+        {errorMessage ? <Text color="red.500">{errorMessage}</Text> : null}
         <FormControl>
           <FormControl.Label>Confirm Password</FormControl.Label>
-          <Input type="password" />
+          <Input
+            type="password"
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
         </FormControl>
-        <Button mt="2" colorScheme="lightBlue">
+        <Button mt="2" colorScheme="lightBlue" onPress={handleSignUp}>
           Sign up
         </Button>
+        
       </VStack>
     </Box>
   </Center>
-);
+  );
+};
 
 const initialLayout = {
   width: Dimensions.get('window').width,
@@ -67,7 +143,7 @@ const renderScene = ({ route, navigation }) => {
     case 'first':
       return <SignIn navigation={navigation} />;
     case 'second':
-      return <SignUp />;
+      return <SignUp navigation={navigation} />;
     default:
       return null;
   }
@@ -93,8 +169,8 @@ function SignIn({ navigation }) {
       setTimeout(() => {
         // Navigate to the home screen or any other screen
         navigation.navigate('HomeScreen');
-      }, 3000); // 3000 milliseconds = 3 seconds
-      
+        setShowAlert(false);
+      }, 2000); 
       setEmail('');
       setPassword('');
     } catch (error) {
@@ -107,10 +183,29 @@ function SignIn({ navigation }) {
   };
   return (
     <Center w="100%">
-      {showAlert && (
+      
+      <Box safeArea p="2" w="90%" maxW="290" py="8">
+        <Heading
+          size="lg"
+          color="coolGray.800"
+          _dark={{ color: 'warmGray.50' }}
+          fontWeight="semibold"
+        >
+          Welcome
+        </Heading>
+        <Heading
+          mt="1"
+          color="coolGray.600"
+          _dark={{ color: 'warmGray.200' }}
+          fontWeight="medium"
+          size="xs"
+        >
+          Log in to find that tailor that suit your needs:)
+        </Heading>
+        {showAlert && (
         <Alert
           mt="14"
-          w="80%"
+          w="100%"
           variant="outline"
           colorScheme="success"
           status="success"
@@ -130,25 +225,6 @@ function SignIn({ navigation }) {
           </VStack>
         </Alert>
       )}
-      <Box safeArea p="2" w="90%" maxW="290" py="8">
-        <Heading
-          size="lg"
-          color="coolGray.800"
-          _dark={{ color: 'warmGray.50' }}
-          fontWeight="semibold"
-        >
-          Welcome
-        </Heading>
-        <Heading
-          mt="1"
-          color="coolGray.600"
-          _dark={{ color: 'warmGray.200' }}
-          fontWeight="medium"
-          size="xs"
-        >
-          Log in to find that tailor that suit your needs:)
-        </Heading>
-
         <VStack space={3} mt="5">
           <FormControl>
             <FormControl.Label>Email</FormControl.Label>
