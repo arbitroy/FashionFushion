@@ -1,19 +1,19 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList} from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, ScrollView} from 'react-native'
+import React, { useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import CarouselComponent from './components/CarouselComponent';
 import products from '../../data/products'
 
 const HomeScreen = ({ navigation }) => {
-
+    const [test, setTest] = useState('');
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
 
             {/* Header Section */}
             <View style={{flexDirection: 'row', justifyContent:'space-between', paddingHorizontal:15}}>
                 {/* Replace this with your app logo */}
-                <View style={{ flexDirection: 'row', }}><Text style={{ fontSize: 20, fontWeight: 800 }}>Open</Text><Text style={{ fontSize: 20, fontWeight: 800, color: '#FF9900' }}>Shop.</Text></View>
+                <View style={{ flexDirection: 'row', }}><Text style={{ fontSize: 20, fontWeight: '800' }}>Fashion</Text><Text style={{ fontSize: 20, fontWeight: '800', color: '#FF9900' }}>Fushion.</Text></View>
             
                 <View style={{flexDirection: 'row'}}>
                 {/* Account Button */}
@@ -63,9 +63,7 @@ const HomeScreen = ({ navigation }) => {
                     showsHorizontalScrollIndicator={false}
                 />
             </View>
-
-
-        </View>
+        </ScrollView>
     )
 }
 
@@ -97,8 +95,34 @@ const styles = StyleSheet.create({
     },
     h2: {
         fontSize: 20,
-        fontWeight: 600,
+        fontWeight: '600',
     },
+    TextInputContainer: {
+        flexDirection: 'row',
+        borderColor: '#c7c7c7',
+        borderWidth: 1,
+        borderRadius: 5,
+        marginTop: 25,
+        alignItems: 'center',
+        padding: 5,
+      },
+    
+      TextInputText: {
+        marginLeft: 25,
+        width: '100%',
+        verticalAlign: 'middle',
+      },
+    
+      TextInputIcon: {
+        flex: 0,
+        color: '#c7c7c7',
+      },
+    
+      TextButton: {
+        alignSelf: 'center',
+        color: '#808080',
+        textDecorationLine: 'underline',
+      },
     thumbnail: {
         width: 144,
         height: 155,

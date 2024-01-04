@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "OpenShop",
-    "slug": "OpenShop",
+    "name": "FashionFushion",
+    "slug": "fashion-fushion",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.austine_ndauwa.fashionfushion"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7915f5d9-4a21-4c88-91bf-5309db5ff119"
+      }
+    },
+    "owner": "austine_ndauwa"
   }
 }

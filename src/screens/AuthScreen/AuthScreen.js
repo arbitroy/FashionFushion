@@ -1,175 +1,250 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Animated } from 'react-native';
-import React from 'react'
-import { AntDesign } from '@expo/vector-icons';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Dimensions, StatusBar, Animated, Pressable } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import {
+  Box,
+  Center,
+  Heading,
+  VStack,
+  FormControl,
+  Input,
+  Button,
+  useColorModeValue,
+  Link,
+  Alert,
+  HStack,
+  Text,
+} from 'native-base';
+import { FIREBASE_AUTH } from '../../services/FirebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+const SignUp = () => (
+  <Center w="100%">
+    <Box safeArea p="2" w="90%" maxW="290" py="8">
+      <Heading
+        size="lg"
+        color="coolGray.800"
+        _dark={{ color: 'warmGray.50' }}
+        fontWeight="semibold"
+      >
+        Welcome
+      </Heading>
+      <Heading
+        mt="1"
+        color="coolGray.600"
+        _dark={{ color: 'warmGray.200' }}
+        fontWeight="medium"
+        size="xs"
+      >
+        Sign up to continue!
+      </Heading>
+      <VStack space={3} mt="5">
+        <FormControl>
+          <FormControl.Label>Email</FormControl.Label>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormControl.Label>Password</FormControl.Label>
+          <Input type="password" />
+        </FormControl>
+        <FormControl>
+          <FormControl.Label>Confirm Password</FormControl.Label>
+          <Input type="password" />
+        </FormControl>
+        <Button mt="2" colorScheme="lightBlue">
+          Sign up
+        </Button>
+      </VStack>
+    </Box>
+  </Center>
+);
 
-const AuthScreen = ({ navigation }) => {
+const initialLayout = {
+  width: Dimensions.get('window').width,
+};
 
-    const SigninComponent = () => {
-        return (
-            <View
-                style={styles.formContainer}>
+const renderScene = ({ route, navigation }) => {
+  switch (route.key) {
+    case 'first':
+      return <SignIn navigation={navigation} />;
+    case 'second':
+      return <SignUp />;
+    default:
+      return null;
+  }
+};
 
-                {/* Email input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="mail" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Email'
-                        style={styles.TextInputText}
-                    />
-                </View>
+function SignIn({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-                {/* Password input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="lock" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Password'
-                        style={styles.TextInputText}
-                    />
-                </View>
-
-                {/* Sign in Button */}
-                <TouchableOpacity style={styles.Button}>
-                    <Text style={styles.ButtonText}>SIGN IN</Text>
-                </TouchableOpacity>
-            </View>
-        )
+  const handleSignIn = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Successfully signed in
+      console.log('User signed in:', userCredential.user);
+      setShowAlert(true);
+      // Delay navigation by 3 seconds (or any duration you prefer)
+      setTimeout(() => {
+        // Navigate to the home screen or any other screen
+        navigation.navigate('HomeScreen');
+      }, 3000); // 3000 milliseconds = 3 seconds
+      
+      setEmail('');
+      setPassword('');
+    } catch (error) {
+      // Handle sign-in errors
+      console.error('Error signing in:', error.message);
+      // Display an error message to the user, for example using an alert or a toast notification
+      alert(error.message);
+      setPassword('');
     }
+  };
+  return (
+    <Center w="100%">
+      {showAlert && (
+        <Alert
+          mt="14"
+          w="80%"
+          variant="outline"
+          colorScheme="success"
+          status="success"
+        >
+          <VStack space={2} flexShrink={1} w="100%">
+            <HStack
+              flexShrink={1}
+              space={2}
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack space={2} flexShrink={1} alignItems="center">
+                <Alert.Icon />
+                <Text>Successfully logged in</Text>
+              </HStack>
+            </HStack>
+          </VStack>
+        </Alert>
+      )}
+      <Box safeArea p="2" w="90%" maxW="290" py="8">
+        <Heading
+          size="lg"
+          color="coolGray.800"
+          _dark={{ color: 'warmGray.50' }}
+          fontWeight="semibold"
+        >
+          Welcome
+        </Heading>
+        <Heading
+          mt="1"
+          color="coolGray.600"
+          _dark={{ color: 'warmGray.200' }}
+          fontWeight="medium"
+          size="xs"
+        >
+          Log in to find that tailor that suit your needs:)
+        </Heading>
 
-    const SignupComponent = () => {
-        return (
-            <View style={styles.formContainer}>
+        <VStack space={3} mt="5">
+          <FormControl>
+            <FormControl.Label>Email</FormControl.Label>
+            <Input value={email} onChangeText={(text) => setEmail(text)} />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Password</FormControl.Label>
+            <Input
+              type="password"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+            />
+          </FormControl>
 
-                {/* Full name input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="user" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Full Name'
-                        style={styles.TextInputText}
-                    />
-                </View>
+          <Button mt="2" colorScheme="lightBlue" onPress={handleSignIn}>
+            Sign in
+          </Button>
 
-                {/* Email input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="mail" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Email'
-                        style={styles.TextInputText}
-                    />
-                </View>
-
-                {/* Password input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="lock" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Password'
-                        style={styles.TextInputText}
-                    />
-                </View>
-
-                {/* Re-enter Password input */}
-                <View style={styles.TextInputContainer}>
-                    <AntDesign name="lock" size={24} style={styles.TextInputIcon} />
-                    <TextInput
-                        placeholder='Re-enter Password'
-                        style={styles.TextInputText}
-                    />
-                </View>
-
-                {/* Sign in Button */}
-                <TouchableOpacity style={styles.Button}>
-                    <Text style={styles.ButtonText}>SIGN IN</Text>
-                </TouchableOpacity>
-            </View>
-        )
-    }
-
-    const Tab = createMaterialTopTabNavigator();
-
-    return (
-        <View style={styles.container}>
-
-            {/* Replace this with your app logo */}
-            <View style={{ flexDirection: 'row', }}><Text style={{ fontSize: 32, fontWeight: 800 }}>Open</Text><Text style={{ fontSize: 32, fontWeight: 800, color: '#FF9900' }}>Shop.</Text></View>
-
-            {/* Tab navigation between login and signup forms */}
-            <View style={{ flex: 1, marginTop: 30 }}>
-                <NavigationContainer independent={true}>
-                    <Tab.Navigator
-                        screenOptions={{
-                            tabBarActiveTintColor: 'black',
-                            tabBarIndicatorStyle: { backgroundColor: '#000000' },
-                            animationEnabled: false,
-                        }}
-                    >
-                        <Tab.Screen name='Sign in' component={SigninComponent} />
-                        <Tab.Screen name='Sign up' component={SignupComponent} />
-                    </Tab.Navigator>
-                </NavigationContainer>
-            </View>
-
-            { /* Button to signin as guest */}
-            <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                <Text style={styles.TextButton}>Sign in as a Guest</Text>
-            </TouchableOpacity>
-
-        </View>
-    )
+          <Link
+            mt="1/6"
+            m="auto"
+            onPress={() => navigation.navigate('HomeScreen')}
+          >
+            Sign in as guest
+          </Link>
+        </VStack>
+      </Box>
+    </Center>
+  );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingTop: 30,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-    },
+const AuthScreen = ({ navigation }) => {
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'first', title: 'Login' },
+    { key: 'second', title: 'Sign Up' },
+  ]);
 
-    formContainer: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
+  const renderTabBar = (props) => {
+    const inputRange = props.navigationState.routes.map((x, i) => i);
+    return (
+      <Box>
+        <Heading style={{ flexDirection: 'row', paddingLeft: 10 }}>
+          <Heading style={{ fontSize: 25, fontWeight: '800' }}>Fashion</Heading>
+          <Heading
+            style={{ fontSize: 25, fontWeight: '800', color: '#3ededb' }}
+          >
+            Fushion.
+          </Heading>
+        </Heading>
+        <Box flexDirection="row">
+          {props.navigationState.routes.map((route, i) => {
+            const opacity = props.position.interpolate({
+              inputRange,
+              outputRange: inputRange.map((inputIndex) =>
+                inputIndex === i ? 1 : 0.5
+              ),
+            });
+            const color =
+              index === i
+                ? useColorModeValue('#000', '#e5e5e5')
+                : useColorModeValue('#1f2937', '#a1a1aa');
+            const borderColor =
+              index === i
+                ? 'cyan.500'
+                : useColorModeValue('coolGray.200', 'gray.400');
+            return (
+              <Box
+                key={route.key}
+                borderBottomWidth="3"
+                borderColor={borderColor}
+                flex={1}
+                alignItems="center"
+                p="3"
+                cursor="pointer"
+              >
+                <Pressable onPress={() => setIndex(i)}>
+                  <Animated.Text style={{ color }}>{route.title}</Animated.Text>
+                </Pressable>
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    );
+  };
 
-    TextInputContainer: {
-        flexDirection: 'row',
-        borderColor: '#c7c7c7',
-        borderWidth: 1,
-        borderRadius: 5,
-        marginTop: 25,
-        alignItems: 'center',
-        padding: 5,
-    },
-
-    TextInputText: {
-        marginLeft: 25,
-        width: '100%',
-        verticalAlign: 'middle'
-    },
-
-    TextInputIcon: {
-        flex: 0,
-        color: '#c7c7c7'
-    },
-
-    TextButton: {
-        alignSelf: 'center',
-        color: '#808080',
-        textDecorationLine: 'underline'
-    },
-
-    Button: {
-        marginTop: 25,
-        backgroundColor: 'black',
-        alignItems: 'center',
-        padding: 10,
-        borderRadius: 5,
-    },
-
-    ButtonText: {
-        color: '#fff'
-    },
-});
-
+  return (
+    <TabView
+      navigationState={{ index, routes }}
+      renderScene={(props) => renderScene({ ...props, navigation })}
+      renderTabBar={renderTabBar}
+      onIndexChange={setIndex}
+      initialLayout={initialLayout}
+      style={{ marginTop: StatusBar.currentHeight }}
+    />
+  );
+};
 export default AuthScreen;
