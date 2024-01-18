@@ -6,7 +6,7 @@ import CarouselComponent from './components/CarouselComponent';
 import products from '../../data/products'
 
 const HomeScreen = ({ navigation }) => {
-    const [test, setTest] = useState('');
+    
     return (
         <ScrollView style={styles.container}>
 
@@ -17,7 +17,9 @@ const HomeScreen = ({ navigation }) => {
             
                 <View style={{flexDirection: 'row'}}>
                 {/* Account Button */}
-                <TouchableOpacity><MaterialCommunityIcons name="account-circle-outline" style={styles.iconButton} size={24} color="black" /></TouchableOpacity>
+                <TouchableOpacity><MaterialCommunityIcons name="account-circle-outline" onPress={() => navigation.navigate('UserProfile')} style={styles.iconButton} size={24} color="black" /></TouchableOpacity>
+                 {/* Chat Button */}
+                <TouchableOpacity><MaterialCommunityIcons name="chat" onPress={() => navigation.navigate('ChatScreen')} style={styles.iconButton} size={24} color="black" /></TouchableOpacity>
                 {/* Favorites Button */}
                 <TouchableOpacity><MaterialCommunityIcons name="cards-heart-outline" style={styles.iconButton} size={24} color="black" /></TouchableOpacity>
                 {/* Cart Button */}

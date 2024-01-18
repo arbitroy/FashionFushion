@@ -20,7 +20,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "googleServicesFile": "./google-services.json"
+
       },
       "package": "com.austine_ndauwa.fashionfushion"
     },
@@ -32,6 +34,8 @@
         "projectId": "7915f5d9-4a21-4c88-91bf-5309db5ff119"
       }
     },
-    "owner": "austine_ndauwa"
+    "owner": "austine_ndauwa",
+    "plugins": ["@react-native-google-signin/google-signin"]
+    
   }
 }

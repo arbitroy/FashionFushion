@@ -4,9 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { enableFreeze } from 'react-native-screens';
 import { NativeBaseProvider, Box } from "native-base";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 export default function App() {
   enableFreeze(true);
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <NativeBaseProvider>
 
     <SafeAreaView style={styles.container}>
@@ -16,6 +18,7 @@ export default function App() {
       
     </SafeAreaView>
     </NativeBaseProvider>
+    </GestureHandlerRootView>
   );
 }
 
