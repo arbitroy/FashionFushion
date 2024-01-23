@@ -24,6 +24,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setDoc, doc, getDoc } from 'firebase/firestore';
+import { FIREBASE_STORAGE } from '../../services/FirebaseConfig';
 
 GoogleSignin.configure({
   webClientId: '440968322493-v8lpp8bvr92poet54p304pdcuacv2qdc.apps.googleusercontent.com',
@@ -76,7 +77,7 @@ const SignUp = ({ navigation }) => {
         // Navigate to the home screen or any other screen
         navigation.navigate('HomeScreen');
         setShowAlert(false);
-      }, 2000);
+      }, 500);
       setErrorMessage('');
       setNewAddress('');
       setNewPhone('');
@@ -203,34 +204,8 @@ function SignIn({ navigation }) {
   const [password, setPassword] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [userInfo, setUserInfo] = useState(null);
+
   const auth = FIREBASE_AUTH;
-  const signIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      
-      const userInfo = await GoogleSignin.signIn();
-    setState({ userInfo });
-    console.log(userInfo)
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
-        setShowAlert(true);
-        setTimeout(() => {
-          navigation.navigate('HomeScreen');
-          setShowAlert(false);
-        }, 2000);
-        setErrorMessage('');
-        setEmail('');
-        setPassword('');
-      }
-    }
-  };
 
 
   const handleSignIn = async () => {
@@ -245,20 +220,19 @@ function SignIn({ navigation }) {
       const userName = userDoc.data().name;
 
       // Save user token and name in AsyncStorage
-      await AsyncStorage.setItem('userToken', userCredential.user.uid);
+      await AsyncStorage.setItem('userID', userCredential.user.uid);
       await AsyncStorage.setItem('userName', userName);
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userAddress', userDoc.data().address || '');
       await AsyncStorage.setItem('userPhoneNumber', userDoc.data().phone || '');
-      // Successfully signed in
-      console.log('User signed in:', userName);
+      await AsyncStorage.setItem('userProfilePicture', userDoc.data().profilePicture || '');
       setShowAlert(true);
       // Delay navigation by 3 seconds (or any duration you prefer)
       setTimeout(() => {
         // Navigate to the home screen or any other screen
         navigation.navigate('HomeScreen');
         setShowAlert(false);
-      }, 1000);
+      },100);
       setErrorMessage('');
       setEmail('');
       setPassword('');
@@ -341,12 +315,7 @@ function SignIn({ navigation }) {
             >
               Sign in as guest
             </Link>
-            {/* <Button mt={6} height={10} size="sm" variant="outline" onPress={signIn}>
-              <HStack space={2} alignItems="center">
-                <Icon as={FontAwesome} name="google" />
-                <Text>Sign in with Google</Text>
-              </HStack>
-            </Button> */}
+          
           </HStack>
 
         </VStack>
@@ -369,7 +338,7 @@ const AuthScreen = React.memo(({ navigation }) => {
         <Heading style={{ flexDirection: 'row', paddingLeft: 10 }}>
           <Heading style={{ fontSize: 25, fontWeight: '800' }}>Fashion</Heading>
           <Heading
-            style={{ fontSize: 25, fontWeight: '800', color: '#3ededb' }}
+            style={{ fontSize: 25, fontWeight: '800', color: '#327ba8' }}
           >
             Fushion.
           </Heading>

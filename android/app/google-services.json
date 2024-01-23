@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "440968322493",
+    "project_id": "fashionfushion-407309",
+    "storage_bucket": "fashionfushion-407309.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440968322493:android:cdc69ddee5c8ddcf7c46d4",
+        "android_client_info": {
+          "package_name": "com.austine_ndauwa.fashionfushion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "440968322493-r0anv1jktlhvvmsd450dj9sakt6jeesd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.austine_ndauwa.fashionfushion",
+            "certificate_hash": "8cd63754b8a203054121f614b15af9b2cc984ad4"
+          }
+        },
+        {
+          "client_id": "440968322493-v8lpp8bvr92poet54p304pdcuacv2qdc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFdb-RTrYZ6XGOkKO5TKv59s86BwjPBRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440968322493-v8lpp8bvr92poet54p304pdcuacv2qdc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

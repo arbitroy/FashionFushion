@@ -2,22 +2,17 @@ import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
-    TouchableOpacity,
     ScrollView,
     View,
-    Text,
-    TextInput,
-    Image,
-    Alert,
 } from 'react-native';
-import { Avatar, Button, HStack, Divider, Heading, VStack } from "native-base";
+import { Avatar, Button, HStack, Divider, Heading, VStack, Spinner, Pressable,Text, Icon } from "native-base";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
-import { FIREBASE_STORAGE } from '../../services/FirebaseConfig';
+import { FIREBASE_DB } from '../../services/FirebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
-import {launchImageLibrary} from 'react-native-image-picker';
-import { auth } from '../../services/FirebaseConfig';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+
 const UserProfile = ({ navigation }) => {
     const [profilePictureUrl, setProfilePictureUrl] = useState('');
     const [userDetails, setUserDetails] = useState({
@@ -25,33 +20,51 @@ const UserProfile = ({ navigation }) => {
         email: '',
         address: '',
         phoneNumber: '',
-        token:'',
+        Id: '',
     });
-    const handleUploadPicture = async (imageUri) => {
-        const storage = ref(FIREBASE_STORAGE, 'profilePictures/' + userDetails.token);
+    const [uploading, setUploading] = useState(false);
+    const handleUploadPicture = async (imagePath) => {
+        const storageRef = storage().ref(`profilePictures/${userDetails.Id}`);
 
         try {
-          // Convert image to bytes
-          const response = await fetch(imageUri);
-          const blob = await response.blob();
-      
-          // Upload bytes to Firebase Storage
-          await uploadBytes(storage, blob);
-      
-          // Get the download URL of the uploaded image
-          const downloadURL = await getDownloadURL(storage);
-      
-          // Update user profile in Firestore with the new profile picture URL
-          const userDocRef = doc(FIREBASE_DB, 'users', token);
-          await updateDoc(userDocRef, { profilePicture: downloadURL });
-      
-          // Update the profilePictureUrl state
-          setProfilePictureUrl(downloadURL);
-      
-        } catch (error) {
-          console.error('Error uploading profile picture:', error.message);
+            setUploading(true);
+            // Upload compressed image to Firebase Storage
+            const task = storageRef.putFile(imagePath);
+            task.on(
+                'state_changed',
+                (snapshot) => {
+                    // Handle upload progress (if needed)
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                },
+                (error) => {
+                    // Handle errors during upload
+                    console.error('Error uploading profile picture:', error.message);
+                    setUploading(false);
+                },
+                async () => {
+                    // Upload completed successfully, get download URL
+                    try {
+                        const downloadURL = await storageRef.getDownloadURL();
+                        // Update user profile in Firestore with the new profile picture URL
+                        const userDocRef = doc(FIREBASE_DB, 'users', userDetails.Id);
+                        await updateDoc(userDocRef, { profilePicture: downloadURL });
+                        // Update the profilePictureUrl state
+                        setProfilePictureUrl(downloadURL);
+                        await AsyncStorage.setItem('userProfilePicture', downloadURL || '');
+                    } catch (downloadError) {
+                        console.error('Error getting download URL:', downloadError.message);
+                        setUploading(false);
+                    } finally {
+                        setUploading(false);
+                    }
+                }
+            );
+        } catch (uploadError) {
+            console.error('Error uploading profile picture:', uploadError.message);
+            setUploading(false);
         }
     };
+
     useEffect(() => {
         // Retrieve user details from AsyncStorage or authentication state
         // Update the userDetails state with the retrieved data
@@ -61,14 +74,15 @@ const UserProfile = ({ navigation }) => {
                 const email = await AsyncStorage.getItem('userEmail');
                 const address = await AsyncStorage.getItem('userAddress');
                 const phoneNumber = await AsyncStorage.getItem('userPhoneNumber');
-                const token = await AsyncStorage.getItem('userToken');
+                const Id = await AsyncStorage.getItem('userID');
                 setUserDetails({
                     name: name || '',
                     email: email || '',
                     address: address || '',
                     phoneNumber: phoneNumber || '',
-                    token: token ||  '',
+                    Id: Id || '',
                 });
+                setProfilePictureUrl(await AsyncStorage.getItem('userProfilePicture'));
             } catch (error) {
                 console.error('Error retrieving user details:', error.message);
             }
@@ -80,79 +94,109 @@ const UserProfile = ({ navigation }) => {
     const handleEditProfile = async () => {
         try {
             const options = {
-                mediaType: 'photo', // or 'video' if you want to allow videos
+                mediaType: 'photo',
                 includeBase64: false,
-                quality: 1,
+                quality: 0.8, // Adjust the quality as needed (0 to 1)
             };
-
             const result = await launchImageLibrary(options);
-
             if (!result.didCancel) {
-                await handleUploadPicture(result.assets[0].uri);
+                // Compress the image before uploading
+                const compressedImageUri = result.assets[0].uri; // You can use this uri for uploading
+                await handleUploadPicture(compressedImageUri);
             }
         } catch (error) {
-            console.error('Error selecting profile picture:', error.message);
+            console.error('Error selecting or compressing the profile picture:', error.message);
         }
     };
 
     return (
         <SafeAreaView >
             <ScrollView>
-                <View style={styles.profileContainer}>
-                    <VStack alignItems={"center"} mr={10}>
-                        {/* Profile Picture */}
-                        <Avatar bg="green.500" source={{ uri: profilePictureUrl || "default_profile_picture_url" }} size={"2xl"}>
-                            {userDetails.name.charAt(0)}
-                        </Avatar>
+                <VStack alignItems={"center"} m="6">
+                    {/* Profile Picture */}
+                    <Avatar bg="green.500" source={{ uri: profilePictureUrl || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" }} size={"2xl"}>
+                        {userDetails.name.charAt(0)}
 
-                        <Button onPress={handleEditProfile} size="lg" style={styles.editButton}>
-                            <HStack>
-                                <MaterialCommunityIcons
-                                    name="pencil-outline"
-                                    size={20}
-                                    color="black"
-                                />
-                                <Text style={styles.editButtonText}>Edit profile picture</Text>
-                            </HStack>
+                    </Avatar>
+                    {uploading && <Spinner color="cyan.500" />}
+                    <Button onPress={handleEditProfile} size="lg" style={styles.editButton}>
+                        <HStack>
+                            <MaterialCommunityIcons
+                                name="pencil-outline"
+                                size={20}
+                                color="lightblue"
+                            />
+                            <Text style={styles.editButtonText}>Edit profile picture</Text>
+                        </HStack>
+                    </Button>
+                </VStack>
+                <Pressable ml={1} mb={3} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="4">
+                    <Text fontSize="2xl">My Details</Text>
+                    <View style={styles.profileContainer}>
 
-                        </Button>
-                    </VStack>
+                        {/* User Details */}
+                        <VStack space={2} width={"280"}>
+                            <Heading flexDirection="row" size="xs" >Name</Heading>
+                            <Divider _light={{
+                                bg: "muted.300"
+                            }} _dark={{
+                                bg: "muted.50"
+                            }} />
+                            <Text style={styles.userName}>{userDetails.name}</Text>
+                            <Heading flexDirection="row" size="xs">Email</Heading>
+                            <Divider _light={{
+                                bg: "muted.300"
+                            }} _dark={{
+                                bg: "muted.50"
+                            }} />
+                            <Text style={styles.userInfo}>{userDetails.email}</Text>
+                            <Heading flexDirection="row" size="xs">Address</Heading>
+                            <Divider _light={{
+                                bg: "muted.300"
+                            }} _dark={{
+                                bg: "muted.50"
+                            }} />
+                            <Text style={styles.userInfo}>{userDetails.address}</Text>
+                            <Heading flexDirection="row" size="xs">Phone Number</Heading>
+                            <Divider _light={{
+                                bg: "muted.300"
+                            }} _dark={{
+                                bg: "muted.50"
+                            }} />
+                            <Text style={styles.userInfo}>{userDetails.phoneNumber}</Text>
+                        </VStack>
 
-                    {/* User Details */}
-                    <VStack space={2} width={"280"}>
-                        <Heading alignItems={"start"} flexDirection="row" size="md" >Name</Heading>
-                        <Divider _light={{
-                            bg: "muted.300"
-                        }} _dark={{
-                            bg: "muted.50"
-                        }} />
-                        <Text style={styles.userName}>{userDetails.name}</Text>
-                        <Heading alignItems={"start"} flexDirection="row" size="md">Email</Heading>
-                        <Divider _light={{
-                            bg: "muted.300"
-                        }} _dark={{
-                            bg: "muted.50"
-                        }} />
-                        <Text style={styles.userInfo}>{userDetails.email}</Text>
-                        <Heading alignItems={"start"} flexDirection="row" size="md">Address</Heading>
-                        <Divider _light={{
-                            bg: "muted.300"
-                        }} _dark={{
-                            bg: "muted.50"
-                        }} />
-                        <Text style={styles.userInfo}>{userDetails.address}</Text>
-                        <Heading alignItems={"start"} flexDirection="row" size="md">Phone Number</Heading>
-                        <Divider _light={{
-                            bg: "muted.300"
-                        }} _dark={{
-                            bg: "muted.50"
-                        }} />
-                        <Text style={styles.userInfo}>{userDetails.phoneNumber}</Text>
-                    </VStack>
+                    </View>
+                </Pressable>
 
-                </View>
-
-
+                <Pressable  onPress={() => navigation.navigate('Shop')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                    <Text fontSize="xl"><MaterialCommunityIcons
+                                name="store"
+                                size={25}
+                                color="lightblue"
+                            /> My Shop</Text>
+                    </Pressable>
+                    {/* <Pressable  onPress={() => navigation.navigate('ChatScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                    <Text fontSize="xl"><MaterialCommunityIcons
+                                name="shopping"
+                                size={25}
+                                color="lightblue"
+                            /> My Orders</Text>
+                    </Pressable> */}
+                    <Pressable  onPress={() => navigation.navigate('ChatScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                    <Text fontSize="xl"><MaterialCommunityIcons
+                                name="chat"
+                                size={25}
+                                color="lightblue"
+                            /> Messages</Text>
+                    </Pressable>
+                    <Pressable  onPress={() => navigation.navigate('HomeScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                    <Text fontSize="xl"><MaterialCommunityIcons
+                                name="home"
+                                size={25}
+                                color="lightblue"
+                            /> Home</Text>
+                    </Pressable>
             </ScrollView>
         </SafeAreaView>
     );
