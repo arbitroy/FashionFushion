@@ -10,7 +10,7 @@ const ProductCard = ({ item, onPress }) => {
                 {/* Product thumbnail */}
                 <Image
                     style={{ width: 144, height: 155, resizeMode: 'cover', borderRadius: 12 }}
-                    source={{ uri: (item.thumbnail ?? item.image.uri) || 'https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg' }}
+                    source={{ uri: (item.thumbnail ?? item.image?.uri) || 'https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg' }}
                 />
                 {/* Product title */}
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 15, marginTop: 6 }}>{item.title || item.name}</Text>

@@ -183,7 +183,7 @@ const UserProfile = ({ navigation }) => {
                                 color="lightblue"
                             /> My Orders</Text>
                     </Pressable> */}
-                    <Pressable  onPress={() => navigation.navigate('ChatScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                    <Pressable  onPress={() => navigation.navigate('Inbox')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
                     <Text fontSize="xl"><MaterialCommunityIcons
                                 name="chat"
                                 size={25}

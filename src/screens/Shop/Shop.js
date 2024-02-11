@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, StyleSheet, Modal as RNModal, View, TextInput, TouchableOpacity } from 'react-native';
-import { Badge, Box, HStack, Image, VStack, IconButton, Heading, Button as NButton, AspectRatio, Stack, Alert } from 'native-base';
+import { ScrollView, Text, StyleSheet, Modal as RNModal, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+
+import { Badge, Box, HStack, Image, VStack, IconButton, Heading, Button as NButton, AspectRatio, Stack, TextArea} from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { doc, getDoc, updateDoc,collection,addDoc,getDocs,query,where } from 'firebase/firestore';
@@ -208,14 +209,14 @@ const Shop = ({ navigation }) => {
   
         // Get the download URL of the uploaded image
         const downloadURL = await getDownloadURL(storageRef);
-  
-        // Update the newProduct state with the download URL and unique identifier
+        newProduct.image = { uri: downloadURL, name: uniqueIdentifier };
+      
+          // Update the newProduct state with the download URL and unique identifier
         setNewProduct((prevProduct) => ({
           ...prevProduct,
           image: { uri: downloadURL, name: uniqueIdentifier },
         }));
       }
-  
       // Update the product document
       await updateDoc(doc(productsCollection, tailorDetails.products[editingProductIndex].id), {
         name: newProduct.name,
@@ -229,16 +230,18 @@ const Shop = ({ navigation }) => {
       setEditingProductIndex(null);
   
       setIsProductEditModalVisible(false);
-      setNewProduct({
-        name: '',
-        description: '',
-        price: 0,
-        image: null,
-        userId : ''
-      });
+      
     } catch (error) {
       console.error('Error updating product details:', error.message);
     }
+    setNewProduct({
+      name: '',
+      description: '',
+      price: 0,
+      image: null,
+      userId : ''
+    });
+    await fetchTailorDetails();
   };
   
   
@@ -416,8 +419,8 @@ const Shop = ({ navigation }) => {
                     onChangeText={(text) => setTailorDetails({ ...tailorDetails, shop: text })}
                   />
                   <Text style={styles.modalText}>Shop description</Text>
-                  <TextInput
-                    style={styles.modalInput}
+                  <TextArea
+                    style={styles.modalTextArea}
                     placeholder="Enter shop description"
                     value={tailorDetails.description}
                     onChangeText={(text) => setTailorDetails({ ...tailorDetails, description: text })}
@@ -451,7 +454,9 @@ const Shop = ({ navigation }) => {
                     <NButton size="md" variant="subtle" onPress={handleEditDetails}  >
                       SAVE
                     </NButton>
-                    <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => setIsDescriptionModalVisible(false)}>
+                    <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => {
+                      setIsDescriptionModalVisible(false)
+                    }}>
                       CANCEL
                     </NButton>
                   </View>
@@ -481,8 +486,8 @@ const Shop = ({ navigation }) => {
                   />
 
                   <Text style={styles.modalText}>Product Description</Text>
-                  <TextInput
-                    style={styles.modalInput}
+                  <TextArea
+                    style={styles.modalTextArea}
                     placeholder="Enter product description"
                     value={newProduct.description}
                     onChangeText={(text) => setNewProduct((prevProduct) => ({ ...prevProduct, description: text }))}
@@ -519,7 +524,16 @@ const Shop = ({ navigation }) => {
                     <NButton size="md" variant="subtle" onPress={handleAddProduct} marginX={3}>
                       ADD PRODUCT
                     </NButton>
-                    <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => setIsProductModalVisible(false)} marginX={3}>
+                    <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => {
+                      setIsProductModalVisible(false);
+                      setNewProduct({
+                        name: '',
+                        description: '',
+                        price: 0,
+                        image: null,
+                        userId: '',
+                      });
+                    }} marginX={3}>
                       CANCEL
                     </NButton>
                   </View>
@@ -551,8 +565,8 @@ const Shop = ({ navigation }) => {
               />
 
               <Text style={styles.modalText}>Product Description</Text>
-              <TextInput
-                style={styles.modalInput}
+              <TextArea
+                style={styles.modalTextArea}
                 placeholder="Enter product description"
                 value={newProduct.description}
                 onChangeText={(text) => setNewProduct((prevProduct) => ({ ...prevProduct, description: text }))}
@@ -588,7 +602,16 @@ const Shop = ({ navigation }) => {
                 <NButton size="md" variant="subtle" onPress={handleUpdateProduct} marginX={3}>
                   UPDATE PRODUCT
                 </NButton>
-                <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => setIsProductEditModalVisible(false)} marginX={3}>
+                <NButton size="md" variant="subtle" colorScheme="secondary" onPress={() => {
+                  setNewProduct({
+                    name: '',
+                    description: '',
+                    price: 0,
+                    image: null,
+                    userId: '',
+                  });
+                  setIsProductEditModalVisible(false)
+                  }} marginX={3}>
                   CANCEL
                 </NButton>
               </View>
@@ -637,6 +660,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     elevation: 5,
+  },
+  modalTextArea: {
+    padding: 8,
+    borderRadius: 5
   },
   modalInput: {
     height: 40,

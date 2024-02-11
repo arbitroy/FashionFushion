@@ -8,6 +8,7 @@ import ChatScreen from '../screens/ChatScreen/ChatScreen';
 import UserProfile from '../screens/UserProfile/UserProfile';
 import Shop from '../screens/Shop/Shop';
 import ProductDetails from '../screens/ProductDetails/ProductDetails';
+import Inbox from '../screens/ChatScreen/Inbox';
 
 
 
@@ -26,7 +27,10 @@ const AppNavigator = () => {
                     initialParams={{ productId: null }} // Set an initial value if needed
                 />
                 <Stack.Screen name='DiscoverScreen' component={DiscoverScreen} />
+
                 <Stack.Screen name='ChatScreen' component={ChatScreen} />
+                <Stack.Screen name='Inbox' component={Inbox} />
+                
                 <Stack.Screen name='UserProfile' component={UserProfile} />
                 <Stack.Screen name='Shop' component={Shop} />
 
