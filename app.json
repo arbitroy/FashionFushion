@@ -36,8 +36,17 @@
     "owner": "austine_ndauwa",
     "plugins": [
       "@react-native-google-signin/google-signin",
-      "@react-native-firebase/app"
-  ]
-    
+      "@react-native-firebase/app",
+      [
+      "react-native-vision-camera",
+      {
+        "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+
+        // optionally, if you want to record audio:
+        "enableMicrophonePermission": true,
+        "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+      }
+    ]
+    ]
   }
 }

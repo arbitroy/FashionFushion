@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Center, Box, Heading, Pressable, VStack, HStack, Text, Spacer, Avatar, Icon } from 'native-base';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
-import { collection, getDocs,onSnapshot } from 'firebase/firestore';
+import { deleteDoc, doc,collection, getDocs,onSnapshot } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../services/FirebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -55,14 +55,17 @@ const Inbox = ({ navigation }) => {
   
     fetchConversations();
   }, []);
-  
-  const deleteRow = (rowMap, rowKey) => {
-    // Implement your delete logic here
+
+  const deleteRow = async (conversationId) => {
+    try {
+      const conversationDocRef = doc(FIREBASE_DB, 'conversations', conversationId);
+      await deleteDoc(conversationDocRef);
+      console.log(`Deleted conversation with ID: ${conversationId}`);
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+    }
   };
 
-  const onRowDidOpen = rowKey => {
-    console.log('This row opened', rowKey);
-  };
 
   const renderItem = ({ item, index }) => (
     <Box>
@@ -82,7 +85,7 @@ const Inbox = ({ navigation }) => {
             </VStack>
             <Spacer />
             <Text fontSize="xs" color="coolGray.800" _dark={{ color: 'warmGray.50' }} alignSelf="flex-start">
-              {item.latestMessageTime}
+            {item.latestMessageTime && item.latestMessageTime.toDate ? item.latestMessageTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
             </Text>
           </HStack>
         </Box>
@@ -99,7 +102,7 @@ const Inbox = ({ navigation }) => {
           </Text>
         </VStack>
       </Pressable>
-      <Pressable w="70" cursor="pointer" bg="red.500" justifyContent="center" onPress={() => deleteRow(rowMap, data.item.key)} _pressed={{ opacity: 0.5 }}>
+      <Pressable w="70" cursor="pointer" bg="red.500" justifyContent="center" onPress={() => deleteRow(data.item.conversationId)} _pressed={{ opacity: 0.5 }}>
         <VStack alignItems="center" space={2}>
           <Icon as={<MaterialIcons name="delete" />} color="white" size="xs" />
           <Text color="white" fontSize="xs" fontWeight="medium">
@@ -109,7 +112,7 @@ const Inbox = ({ navigation }) => {
       </Pressable>
     </HStack>
   );
-
+  
   return (
     <Center flex={1}>
       <Box
@@ -135,7 +138,7 @@ const Inbox = ({ navigation }) => {
           previewRowKey={'0'}
           previewOpenValue={-40}
           previewOpenDelay={3000}
-          onRowDidOpen={onRowDidOpen}
+          
         />
       </Box>
     </Center>
