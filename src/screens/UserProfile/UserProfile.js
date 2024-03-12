@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Avatar, Button, Divider, HStack, Heading, Pressable, Spinner, Text, VStack } from "@gluestack-ui/themed-native-base";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '@react-native-firebase/storage';
+import { doc, updateDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
-    StyleSheet,
     ScrollView,
+    StyleSheet,
     View,
 } from 'react-native';
-import { Avatar, Button, HStack, Divider, Heading, VStack, Spinner, Pressable,Text, Icon } from "native-base";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FIREBASE_DB } from '../../services/FirebaseConfig';
-import { doc, updateDoc } from 'firebase/firestore';
 import { launchImageLibrary } from 'react-native-image-picker';
-import storage from '@react-native-firebase/storage';
+import { FIREBASE_DB } from '../../services/FirebaseConfig';
 
 const UserProfile = ({ navigation }) => {
     const [profilePictureUrl, setProfilePictureUrl] = useState('');
@@ -169,34 +169,34 @@ const UserProfile = ({ navigation }) => {
                     </View>
                 </Pressable>
 
-                <Pressable  onPress={() => navigation.navigate('Shop')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                <Pressable onPress={() => navigation.navigate('Shop')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5" ml={1} mb={3}>
                     <Text fontSize="xl"><MaterialCommunityIcons
-                                name="store"
-                                size={25}
-                                color="lightblue"
-                            /> My Shop</Text>
-                    </Pressable>
-                    {/* <Pressable  onPress={() => navigation.navigate('ChatScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                        name="store"
+                        size={25}
+                        color="lightblue"
+                    /> My Shop</Text>
+                </Pressable>
+                {/* <Pressable  onPress={() => navigation.navigate('ChatScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
                     <Text fontSize="xl"><MaterialCommunityIcons
                                 name="shopping"
                                 size={25}
                                 color="lightblue"
                             /> My Orders</Text>
                     </Pressable> */}
-                    <Pressable  onPress={() => navigation.navigate('Inbox')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                <Pressable onPress={() => navigation.navigate('Inbox')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5" ml={1} mb={3}>
                     <Text fontSize="xl"><MaterialCommunityIcons
-                                name="chat"
-                                size={25}
-                                color="lightblue"
-                            /> Messages</Text>
-                    </Pressable>
-                    <Pressable  onPress={() => navigation.navigate('HomeScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5"ml={1} mb={3}>
+                        name="chat"
+                        size={25}
+                        color="lightblue"
+                    /> Messages</Text>
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate('HomeScreen')} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="5" ml={1} mb={3}>
                     <Text fontSize="xl"><MaterialCommunityIcons
-                                name="home"
-                                size={25}
-                                color="lightblue"
-                            /> Home</Text>
-                    </Pressable>
+                        name="home"
+                        size={25}
+                        color="lightblue"
+                    /> Home</Text>
+                </Pressable>
             </ScrollView>
         </SafeAreaView>
     );

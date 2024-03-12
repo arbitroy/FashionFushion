@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, StyleSheet, Modal as RNModal, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Modal as RNModal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { Badge, Box, HStack, Image, VStack, IconButton, Heading, Button as NButton, AspectRatio, Stack, TextArea} from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { doc, getDoc, updateDoc,collection,addDoc,getDocs,query,where } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
+import { AspectRatio, Badge, Box, HStack, Heading, IconButton, Image, Button as NButton, Stack, TextArea, VStack } from '@gluestack-ui/themed-native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { FIREBASE_DB } from '../../services/FirebaseConfig';
 
 
@@ -38,7 +38,7 @@ const Shop = ({ navigation }) => {
         if (userId) {
           const userDocRef = doc(FIREBASE_DB, 'users', userId);
           const userDoc = await getDoc(userDocRef);
-  
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
             if (userData.role === 'tailor') {
@@ -51,12 +51,12 @@ const Shop = ({ navigation }) => {
                 specialties: userData.specialties || [],
                 products: userData.products || [],
               });
-  
+
               // Fetch products from the "products" collection
               const productsCollection = collection(FIREBASE_DB, 'products');
               const productsSnapshot = await getDocs(query(productsCollection, where('userId', '==', userId)));
               const productsData = productsSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  
+
               setTailorDetails((prevDetails) => ({
                 ...prevDetails,
                 products: productsData,
@@ -71,7 +71,7 @@ const Shop = ({ navigation }) => {
         console.error('Error fetching tailor details:', error.message);
       }
     };
-  
+
     fetchTailorDetails();
   }, []);
 
@@ -121,9 +121,9 @@ const Shop = ({ navigation }) => {
     try {
       const userId = await AsyncStorage.getItem('userID');
       const productsCollection = collection(FIREBASE_DB, 'products');
-  
+
       const uniqueIdentifier = `${newProduct.name}_${Date.now()}`;
-  
+
       let productData = {
         userId: userId,
         name: newProduct.name,
@@ -131,34 +131,34 @@ const Shop = ({ navigation }) => {
         price: newProduct.price,
         image: null, // Set the default value to null
       };
-  
+
       if (newProduct.image) {
         const storage = getStorage();
         const storageRef = ref(storage, `product_images/${uniqueIdentifier}`);
         const response = await fetch(newProduct.image.uri);
         const blob = await response.blob();
         await uploadBytes(storageRef, blob);
-  
+
         const downloadURL = await getDownloadURL(storageRef);
-  
+
         productData.image = { uri: downloadURL, name: uniqueIdentifier };
         setNewProduct((prevProduct) => ({
           ...prevProduct,
           image: { uri: downloadURL, name: uniqueIdentifier },
         }));
       }
-  
+
       // Add a new product to the 'products' collection
       const productRef = await addDoc(productsCollection, productData);
-  
+
       // Update tailor's products array
       await updateDoc(doc(FIREBASE_DB, 'users', userId), {
         products: [...tailorDetails.products, productRef.id],
       });
-  
+
       // Refresh tailor details
       await fetchTailorDetails();
-  
+
       setIsProductModalVisible(false);
       setNewProduct({
         name: '',
@@ -190,15 +190,15 @@ const Shop = ({ navigation }) => {
     try {
       const userId = await AsyncStorage.getItem('userID');
       const productsCollection = collection(FIREBASE_DB, 'products');
-  
+
       // Assuming 'products' is an array property in your tailor details
       const updatedProducts = [...tailorDetails.products];
       // Update the product at the specified index
       updatedProducts[editingProductIndex] = newProduct;
-  
+
       // Create a unique identifier for the image
       const uniqueIdentifier = `${newProduct.name}_${Date.now()}`;
-  
+
       // Check if the image property exists in newProduct
       if (newProduct.image) {
         const storage = getStorage();
@@ -206,12 +206,12 @@ const Shop = ({ navigation }) => {
         const response = await fetch(newProduct.image.uri);
         const blob = await response.blob();
         await uploadBytes(storageRef, blob);
-  
+
         // Get the download URL of the uploaded image
         const downloadURL = await getDownloadURL(storageRef);
         newProduct.image = { uri: downloadURL, name: uniqueIdentifier };
-      
-          // Update the newProduct state with the download URL and unique identifier
+
+        // Update the newProduct state with the download URL and unique identifier
         setNewProduct((prevProduct) => ({
           ...prevProduct,
           image: { uri: downloadURL, name: uniqueIdentifier },
@@ -225,12 +225,12 @@ const Shop = ({ navigation }) => {
         image: newProduct.image ? { uri: newProduct.image.uri, name: uniqueIdentifier } : null,
         userId: userId, // Update userId in the product data
       });
-  
+
       // Reset the editingProductIndex
       setEditingProductIndex(null);
-  
+
       setIsProductEditModalVisible(false);
-      
+
     } catch (error) {
       console.error('Error updating product details:', error.message);
     }
@@ -239,19 +239,19 @@ const Shop = ({ navigation }) => {
       description: '',
       price: 0,
       image: null,
-      userId : ''
+      userId: ''
     });
     await fetchTailorDetails();
   };
-  
-  
+
+
   const fetchTailorDetails = async () => {
     try {
       const userId = await AsyncStorage.getItem('userID');
       if (userId) {
         const userDocRef = doc(FIREBASE_DB, 'users', userId);
         const userDoc = await getDoc(userDocRef);
-  
+
         if (userDoc.exists()) {
           const userData = userDoc.data();
           if (userData.role === 'tailor') {
@@ -264,18 +264,18 @@ const Shop = ({ navigation }) => {
               specialties: userData.specialties || [],
               products: [],
             };
-  
+
             // Fetch and set products based on product IDs stored in the user's document
             const productsSnapshot = await getDocs(collection(FIREBASE_DB, 'products'));
             const userProducts = userData.products || [];
-  
+
             const userProductsData = userProducts.map((productId) => {
               const productData = productsSnapshot.docs.find((doc) => doc.id === productId)?.data();
               return productData ? { ...productData, id: productId } : null;
             });
-  
+
             newTailorDetails.products = [...tailorDetails.products, ...userProductsData.filter(Boolean)];
-  
+
             setTailorDetails(newTailorDetails);
           } else {
             Alert.alert('Not a Tailor', 'You are not set as a tailor. Set up your shop to proceed.');
@@ -367,7 +367,7 @@ const Shop = ({ navigation }) => {
             <Box key={index} alignItems="center" maxWidth={240} rounded="lg" overflow="hidden" borderColor="coolGray.200" borderWidth={1} _dark={{ borderColor: "coolGray.600", backgroundColor: "gray.700" }} _web={{ shadow: 2, borderWidth: 0 }} _light={{ backgroundColor: "gray.50" }} marginX={2}>
               <Box>
                 <AspectRatio w="100%" ratio={16 / 9}>
-                  <Image source={product.image ? { uri: product.image.uri } : { uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg" }} alt="image" resizeMode="contain"/>
+                  <Image source={product.image ? { uri: product.image.uri } : { uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg" }} alt="image" resizeMode="contain" />
                 </AspectRatio>
 
               </Box>
@@ -611,7 +611,7 @@ const Shop = ({ navigation }) => {
                     userId: '',
                   });
                   setIsProductEditModalVisible(false)
-                  }} marginX={3}>
+                }} marginX={3}>
                   CANCEL
                 </NButton>
               </View>

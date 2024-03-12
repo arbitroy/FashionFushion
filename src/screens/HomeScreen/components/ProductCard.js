@@ -16,7 +16,7 @@ const ProductCard = ({ item, onPress }) => {
                 <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontSize: 15, marginTop: 6 }}>{item.title || item.name}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 3 }}>
                     {/* Price */}
-                    <Text style={{ fontWeight: '700' }}>$ {item.price}</Text>
+                    <Text style={{ fontWeight: '700' }}>Ksh {item.price}</Text>
                     {/* Ratings */}
                     <View style={{ flexDirection: 'row' }}>
                         <MaterialCommunityIcons name="star" size={18} color="#FFBE5B" />

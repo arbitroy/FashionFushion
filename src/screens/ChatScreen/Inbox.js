@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Center, Box, Heading, Pressable, VStack, HStack, Text, Spacer, Avatar, Icon } from 'native-base';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
-import { deleteDoc, doc,collection, getDocs,onSnapshot } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../services/FirebaseConfig';
+import { Avatar, Box, Center, HStack, Heading, Icon, Pressable, Spacer, Text, VStack } from '@gluestack-ui/themed-native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import { FIREBASE_DB } from '../../services/FirebaseConfig';
 
 const Inbox = ({ navigation }) => {
   const [conversations, setConversations] = useState([]);
@@ -16,19 +16,19 @@ const Inbox = ({ navigation }) => {
       try {
         const userIdFromStorage = await AsyncStorage.getItem('userID');
         setCurrentUserId(userIdFromStorage);
-  
+
         const conversationsCollection = collection(FIREBASE_DB, 'conversations');
-  
+
         onSnapshot(conversationsCollection, (snapshot) => {
           const conversationsData = snapshot.docs.map((doc) => {
             const data = doc.data();
-            
+
             const latestMessage = data.messages[data.messages.length - 1];
             const latestMessageTime = latestMessage ? latestMessage.time : '';
             if (data.participants.some(participant => participant.id === userIdFromStorage)) {
               const isTailorUser = data.participants[1].id === userIdFromStorage;
               setIsTailor(isTailorUser);
-            
+
               return {
                 conversationId: doc.id,
                 shop: data.shop,
@@ -39,20 +39,20 @@ const Inbox = ({ navigation }) => {
                 product: data.product,
               };
             }
-            
-  
+
+
             return null;
           });
-  
+
           const filteredConversations = conversationsData.filter(Boolean);
-  
+
           setConversations(filteredConversations);
         });
       } catch (error) {
         console.error('Error fetching conversations:', error.message);
       }
     };
-  
+
     fetchConversations();
   }, []);
 
@@ -74,18 +74,18 @@ const Inbox = ({ navigation }) => {
           <HStack alignItems="center" space={3}>
             <Avatar size="48px" source={{ uri: item.avatar || 'https://www.kare-design.com/wp-content/uploads/2015/08/2.jpg' }} />
             <VStack>
-            <Text color="coolGray.800" _dark={{ color: 'warmGray.50' }} bold>
-              {isTailorUser
-                ? `${item.participants[0].name} - Order: ${item.product.productName}`
-                : item.shop || 'Unknown Shop'}
-            </Text>
+              <Text color="coolGray.800" _dark={{ color: 'warmGray.50' }} bold>
+                {isTailorUser
+                  ? `${item.participants[0].name} - Order: ${item.product.productName}`
+                  : item.shop || 'Unknown Shop'}
+              </Text>
               <Text color="coolGray.600" _dark={{ color: 'warmGray.200' }}>
                 {item.recentText}
               </Text>
             </VStack>
             <Spacer />
             <Text fontSize="xs" color="coolGray.800" _dark={{ color: 'warmGray.50' }} alignSelf="flex-start">
-            {item.latestMessageTime && item.latestMessageTime.toDate ? item.latestMessageTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+              {item.latestMessageTime && item.latestMessageTime.toDate ? item.latestMessageTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
             </Text>
           </HStack>
         </Box>
@@ -112,7 +112,7 @@ const Inbox = ({ navigation }) => {
       </Pressable>
     </HStack>
   );
-  
+
   return (
     <Center flex={1}>
       <Box
@@ -138,7 +138,7 @@ const Inbox = ({ navigation }) => {
           previewRowKey={'0'}
           previewOpenValue={-40}
           previewOpenDelay={3000}
-          
+
         />
       </Box>
     </Center>

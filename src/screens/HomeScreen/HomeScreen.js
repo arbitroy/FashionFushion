@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { HStack, Heading, Spinner } from '@gluestack-ui/themed-native-base';
+import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FIREBASE_DB } from '../../services/FirebaseConfig';
 import CarouselComponent from './components/CarouselComponent';
 import ProductCard from './components/ProductCard';
-import { collection, getDocs } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../services/FirebaseConfig';
-import { Center, HStack, Heading, Spinner} from 'native-base';
 
 const HomeScreen = ({ navigation }) => {
   const [fetchedProducts, setFetchedProducts] = useState([]);
@@ -18,7 +18,7 @@ const HomeScreen = ({ navigation }) => {
           productId: doc.id,
           ...doc.data()
         }));
-    
+
         setFetchedProducts(productsData);
       } catch (error) {
         console.error('Error fetching products:', error.message);

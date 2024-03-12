@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, FlatList, Dimensions } from 'react-native';
-import { HStack } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FIREBASE_DB } from '../../services/FirebaseConfig';
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, serverTimestamp, onSnapshot, setDoc, } from 'firebase/firestore';
-import 'react-native-get-random-values'
-import { nanoid } from 'nanoid';
+import { HStack } from '@gluestack-ui/themed-native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addDoc, arrayUnion, collection, doc, getDoc, onSnapshot, serverTimestamp, setDoc, updateDoc, } from 'firebase/firestore';
+import { nanoid } from 'nanoid';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, FlatList, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import 'react-native-get-random-values';
+import { FIREBASE_DB } from '../../services/FirebaseConfig';
 
 const ChatScreen = ({ route, navigation }) => {
   const { product } = route.params || { product: null };
@@ -278,7 +278,7 @@ const ChatScreen = ({ route, navigation }) => {
               disabled={isSending}
             >
               <HStack space={3}>
-                <MaterialCommunityIcons name="ruler" size={18} onPress={openCamera} />
+                <MaterialCommunityIcons name="ruler" size={18} />
                 <MaterialCommunityIcons name="send" size={18} onPress={sendMessageToFirebase} />
               </HStack>
             </TouchableOpacity>

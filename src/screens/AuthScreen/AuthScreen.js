@@ -1,35 +1,32 @@
-import React, { useState } from 'react';
-import { Dimensions, StatusBar, Animated, Pressable } from 'react-native';
-import { TabView } from 'react-native-tab-view';
-import { FontAwesome } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
 import {
-  Box,
-  Center,
-  Heading,
-  VStack,
-  FormControl,
-  Input,
-  Button,
-  useColorModeValue,
-  Link,
   Alert,
+  Box,
+  Button,
+  Center,
+  FormControl,
   HStack,
-  Text,
+  Heading,
+  Input,
+  Link,
   ScrollView,
-  Icon,
   Spinner,
-} from 'native-base';
-import { MaterialIcons } from '@expo/vector-icons';
+  Text,
+  VStack,
+  useColorModeValue
+} from '@gluestack-ui/themed-native-base';
+import * as WebBrowser from 'expo-web-browser';
+import React, { useState } from 'react';
+import { Animated, Dimensions, Pressable, StatusBar } from 'react-native';
+import { TabView } from 'react-native-tab-view';
 
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { setDoc, doc, getDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH, FIREBASE_DB, FIREBASE_STORAGE } from '../../services/FirebaseConfig';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../services/FirebaseConfig';
 
 GoogleSignin.configure({
   webClientId: '440968322493-v8lpp8bvr92poet54p304pdcuacv2qdc.apps.googleusercontent.com',
@@ -164,7 +161,7 @@ function SignIn({ navigation }) {
   const auth = FIREBASE_AUTH;
 
   const handleSignIn = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
 
@@ -211,7 +208,7 @@ function SignIn({ navigation }) {
           {Object.entries(formData).map(([key, value]) => (
             <FormControl key={key}>
               <FormControl.Label>{key.charAt(0).toUpperCase() + key.slice(1)}</FormControl.Label>
-              
+
               <Input
                 value={value}
                 onChangeText={(text) => setFormData({ ...formData, [key]: text })}
