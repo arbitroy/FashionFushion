@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Avatar, Button, Divider, HStack, Heading, Pressable, Spinner, Text, VStack } from "@gluestack-ui/themed-native-base";
+import { Avatar, Icon,Button,ButtonIcon,ButtonText, Divider, HStack, Heading, Pressable, Spinner, Text, VStack } from "@gluestack-ui/themed-native-base";
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import storage from '@react-native-firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -12,6 +13,7 @@ import {
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { FIREBASE_DB } from '../../services/FirebaseConfig';
+import { ButtonGroup } from 'react-native-elements';
 
 const UserProfile = ({ navigation }) => {
     const [profilePictureUrl, setProfilePictureUrl] = useState('');
@@ -115,20 +117,16 @@ const UserProfile = ({ navigation }) => {
                 <VStack alignItems={"center"} m="6">
                     {/* Profile Picture */}
                     <Avatar bg="green.500" source={{ uri: profilePictureUrl || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" }} size={"2xl"}>
-                        {userDetails.name.charAt(0)}
-
+                        {() => userDetails.name.charAt(0)}
                     </Avatar>
                     {uploading && <Spinner color="cyan.500" />}
-                    <Button onPress={handleEditProfile} size="lg" style={styles.editButton}>
-                        <HStack>
-                            <MaterialCommunityIcons
-                                name="pencil-outline"
-                                size={20}
-                                color="lightblue"
-                            />
-                            <Text style={styles.editButtonText}>Edit profile picture</Text>
-                        </HStack>
-                    </Button>
+                    <ButtonGroup
+                        size="md"
+                        variant="solid"
+                        action="primary"
+                        isDisabled={false}
+                        isFocusVisible={false}
+                    />
                 </VStack>
                 <Pressable ml={1} mb={3} rounded="8" overflow="hidden" borderWidth="1" borderColor="coolGray.300" maxW="96" shadow="3" bg="coolGray.100" p="4">
                     <Text fontSize="2xl">My Details</Text>
